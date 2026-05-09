@@ -59,12 +59,16 @@ BOOK_IDENTIFIERS = {
 
 
 def _get_embedding_function():
-    """Lazy-load the sentence-transformers embedding function."""
+    """Lazy-load the Gemini API embedding function.
+    
+    Uses Gemini API for embeddings instead of local ONNX models to save ~200MB+ of RAM.
+    This is critical to prevent Out of Memory (OOM) errors on Render's 512MB free tier.
+    """
     global _embedding_fn
     if _embedding_fn is None:
         from chromadb.utils import embedding_functions
-        _embedding_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-            model_name=settings.EMBEDDING_MODEL
+        _embedding_fn = embedding_functions.GoogleGenerativeAiEmbeddingFunction(
+            api_key=settings.GEMINI_API_KEY
         )
     return _embedding_fn
 
