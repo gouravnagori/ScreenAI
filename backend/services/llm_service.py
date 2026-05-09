@@ -6,11 +6,10 @@ Includes retry logic with model fallback for rate limit resilience.
 
 import json
 import time
-import google.generativeai as genai
+from google import genai
 from config import settings
 
-_model = None
-_configured = False
+_client = None
 
 # Fallback model chain — if primary model quota is exhausted, try alternatives
 MODEL_FALLBACK_CHAIN = [
@@ -20,36 +19,33 @@ MODEL_FALLBACK_CHAIN = [
     "gemini-2.0-flash-lite",
 ]
 
-
-def _get_model(model_name: str = None):
-    """Lazy-initialize the Gemini model."""
-    global _model, _configured
-    if not _configured:
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        _configured = True
-    
-    name = model_name or settings.LLM_MODEL
-    return genai.GenerativeModel(
-        model_name=name,
-        generation_config={
-            "temperature": settings.LLM_TEMPERATURE,
-            "top_p": 0.9,
-            "max_output_tokens": settings.LLM_MAX_TOKENS,
-        },
-    )
-
+def _get_client():
+    """Lazy-initialize the Gemini client."""
+    global _client
+    if not _client:
+        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    return _client
 
 def _call_llm(prompt: str, max_retries: int = 3) -> str:
     """Call LLM with retry logic and model fallback."""
+    client = _get_client()
+    
     for model_name in MODEL_FALLBACK_CHAIN:
         for attempt in range(max_retries):
             try:
-                model = _get_model(model_name)
-                response = model.generate_content(prompt)
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=genai.types.GenerateContentConfig(
+                        temperature=settings.LLM_TEMPERATURE,
+                        top_p=0.9,
+                        max_output_tokens=settings.LLM_MAX_TOKENS,
+                    )
+                )
                 return response.text.strip()
             except Exception as e:
                 error_str = str(e)
-                if "429" in error_str or "ResourceExhausted" in error_str:
+                if "429" in error_str or "ResourceExhausted" in error_str or "quota" in error_str.lower():
                     if attempt < max_retries - 1:
                         wait = 2 ** attempt * 5  # 5s, 10s, 20s
                         print(f"  [RETRY] Rate limited on {model_name}, waiting {wait}s (attempt {attempt+1})")

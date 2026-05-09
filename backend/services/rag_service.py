@@ -59,17 +59,33 @@ BOOK_IDENTIFIERS = {
 
 
 def _get_embedding_function():
-    """Lazy-load the Gemini API embedding function.
+    """Lazy-load the Gemini API embedding function using google-genai.
     
     Uses Gemini API for embeddings instead of local ONNX models to save ~200MB+ of RAM.
-    This is critical to prevent Out of Memory (OOM) errors on Render's 512MB free tier.
+    Using a custom implementation to avoid chromadb's deprecated google.generativeai dependency.
     """
     global _embedding_fn
     if _embedding_fn is None:
-        from chromadb.utils import embedding_functions
-        _embedding_fn = embedding_functions.GoogleGenerativeAiEmbeddingFunction(
-            api_key=settings.GEMINI_API_KEY
-        )
+        from chromadb import Documents, EmbeddingFunction, Embeddings
+        from google import genai
+        
+        class CustomGeminiEmbeddingFunction(EmbeddingFunction):
+            def __init__(self, api_key: str):
+                self.client = genai.Client(api_key=api_key)
+                
+            def __call__(self, input: Documents) -> Embeddings:
+                # Process in small chunks to avoid limits
+                embeddings = []
+                for i in range(0, len(input), 50):
+                    batch = input[i:i+50]
+                    res = self.client.models.embed_content(
+                        model='text-embedding-004',
+                        contents=batch
+                    )
+                    embeddings.extend([e.values for e in res.embeddings])
+                return embeddings
+                
+        _embedding_fn = CustomGeminiEmbeddingFunction(api_key=settings.GEMINI_API_KEY)
     return _embedding_fn
 
 
