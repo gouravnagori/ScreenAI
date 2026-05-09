@@ -285,11 +285,11 @@ npm run dev
 5. Add environment variable: `GEMINI_API_KEY=your_key`
 
 ### Frontend
-1. Create a new **Static Site** on Render
+1. Create a new **Static Site** on Render (or use Vercel)
 2. Set **Root Directory**: `frontend`
 3. **Build Command**: `npm install && npm run build`
 4. **Publish Directory**: `dist`
-5. Add environment variable or update `client.js` with your backend URL
+5. Add environment variable: `VITE_API_URL=https://your-backend-url.onrender.com/api` (Replace with your actual deployed backend URL)
 
 ---
 

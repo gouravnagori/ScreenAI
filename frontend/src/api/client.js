@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE = '/api';
+// In production, configure VITE_API_URL to point to your deployed Render backend (e.g. https://screenai.onrender.com/api)
+// In local development, it defaults to '/api' which uses the vite.config.js proxy.
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 const client = axios.create({
   baseURL: API_BASE,
