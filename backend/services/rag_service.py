@@ -79,7 +79,7 @@ def _get_embedding_function():
                 for i in range(0, len(input), 50):
                     batch = input[i:i+50]
                     res = self.client.models.embed_content(
-                        model='text-embedding-004',
+                        model='gemini-embedding-001',
                         contents=batch
                     )
                     embeddings.extend([e.values for e in res.embeddings])
