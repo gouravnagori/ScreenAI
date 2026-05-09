@@ -1,0 +1,237 @@
+Deep Learning and Neural Networks — Based on Burkov's Hundred-Page ML Book
+
+Chapter 1: Deep Neural Networks
+
+Deep learning is a subfield of machine learning that uses neural networks with many layers (deep architectures) to learn hierarchical representations of data.
+
+Feed-Forward Neural Networks:
+A feed-forward neural network consists of layers of neurons where information flows in one direction — from input to output. Each layer transforms its input by applying a linear transformation followed by a non-linear activation function:
+
+h = activation(W * x + b)
+
+Where W is the weight matrix, b is the bias vector, and activation is a non-linear function.
+
+Activation Functions:
+1. Sigmoid: sigma(z) = 1 / (1 + exp(-z))
+   - Range: (0, 1)
+   - Problem: vanishing gradient for large |z|
+
+2. Tanh: tanh(z) = (exp(z) - exp(-z)) / (exp(z) + exp(-z))
+   - Range: (-1, 1)
+   - Zero-centered, but still has vanishing gradient
+
+3. ReLU (Rectified Linear Unit): f(z) = max(0, z)
+   - No vanishing gradient for positive values
+   - Sparse activation
+   - Problem: "dying ReLU" for negative inputs
+
+4. Leaky ReLU: f(z) = max(alpha*z, z)
+   - Fixes dying ReLU problem
+   - alpha is typically 0.01
+
+5. GELU (Gaussian Error Linear Unit): f(z) = z * Phi(z)
+   - Used in Transformers (BERT, GPT)
+   - Smooth approximation of ReLU
+
+Loss Functions:
+- Mean Squared Error (MSE): L = (1/n) * sum((y_i - y_hat_i)^2)
+  Used for regression tasks
+- Cross-Entropy Loss: L = -sum(y_i * log(y_hat_i))
+  Used for classification tasks
+- Binary Cross-Entropy: L = -[y*log(p) + (1-y)*log(1-p)]
+  Used for binary classification
+
+
+Chapter 2: Training Deep Networks
+
+Optimization Algorithms:
+
+Stochastic Gradient Descent (SGD):
+w = w - learning_rate * gradient(L)
+- Simple and effective
+- May oscillate and converge slowly
+
+SGD with Momentum:
+v = beta * v - learning_rate * gradient(L)
+w = w + v
+- Accelerates convergence
+- Reduces oscillation
+
+Adam (Adaptive Moment Estimation):
+Combines momentum with adaptive learning rates:
+m = beta1 * m + (1 - beta1) * gradient
+v = beta2 * v + (1 - beta2) * gradient^2
+m_hat = m / (1 - beta1^t)
+v_hat = v / (1 - beta2^t)
+w = w - learning_rate * m_hat / (sqrt(v_hat) + epsilon)
+
+Learning Rate Scheduling:
+- Step Decay: Reduce learning rate by factor every N epochs
+- Cosine Annealing: learning_rate = lr_min + 0.5*(lr_max - lr_min)*(1 + cos(pi*t/T))
+- Warm-up: Start with small learning rate, gradually increase
+
+Regularization Techniques:
+
+1. L1 Regularization (Lasso):
+   Loss = Original_Loss + lambda * sum(|w_i|)
+   Promotes sparsity — drives some weights to exactly zero
+
+2. L2 Regularization (Ridge / Weight Decay):
+   Loss = Original_Loss + lambda * sum(w_i^2)
+   Prevents large weights, more commonly used
+
+3. Dropout:
+   During training, randomly set a fraction p of neurons to zero
+   During inference, multiply all weights by (1-p)
+   Prevents co-adaptation of neurons
+
+4. Batch Normalization:
+   Normalize the input of each layer to have zero mean and unit variance
+   x_norm = (x - mean) / sqrt(variance + epsilon)
+   output = gamma * x_norm + beta
+   Benefits: faster training, allows higher learning rates, acts as regularizer
+
+5. Early Stopping:
+   Monitor validation loss during training
+   Stop when validation loss starts increasing (patience of N epochs)
+   Use the model checkpoint with best validation performance
+
+6. Data Augmentation:
+   Create modified versions of training data
+   Images: rotation, flipping, cropping, color jittering
+   Text: synonym replacement, back-translation
+
+
+Chapter 3: Convolutional Neural Networks (CNNs)
+
+CNNs are designed for processing grid-like data (images). They use convolution operations instead of general matrix multiplication.
+
+Convolution Operation:
+A filter (kernel) slides over the input, computing element-wise products and summing them at each position. This produces a feature map that captures local patterns.
+
+Key components:
+- Convolutional Layer: Applies filters to detect features
+- Pooling Layer: Reduces spatial dimensions (max pooling, average pooling)
+- Fully Connected Layer: Final classification/regression
+
+CNN Architectures:
+- LeNet-5 (1998): Pioneer architecture for digit recognition
+- AlexNet (2012): Breakthrough in ImageNet; used ReLU, dropout, GPU training
+- VGGNet (2014): Showed that deeper networks with small 3x3 filters work better
+- GoogLeNet/Inception (2014): Introduced inception modules with parallel convolutions
+- ResNet (2015): Introduced skip connections to train very deep networks (152+ layers)
+  Residual connection: output = F(x) + x
+
+Transfer Learning:
+Pre-train CNN on large dataset (ImageNet), then fine-tune on specific task:
+1. Feature extraction: Freeze pre-trained layers, train only new classifier
+2. Fine-tuning: Unfreeze some layers and train with small learning rate
+
+
+Chapter 4: Recurrent Neural Networks (RNNs)
+
+RNNs process sequential data by maintaining a hidden state that captures information from previous time steps.
+
+Simple RNN:
+h_t = tanh(W_hh * h_(t-1) + W_xh * x_t + b)
+y_t = W_hy * h_t + b_y
+
+Problem: Vanishing and exploding gradients in long sequences.
+
+Long Short-Term Memory (LSTM):
+LSTMs solve the vanishing gradient problem using gates:
+- Forget gate: f_t = sigma(W_f * [h_(t-1), x_t] + b_f)
+- Input gate: i_t = sigma(W_i * [h_(t-1), x_t] + b_i)
+- Cell state update: C_t = f_t * C_(t-1) + i_t * tanh(W_C * [h_(t-1), x_t] + b_C)
+- Output gate: o_t = sigma(W_o * [h_(t-1), x_t] + b_o)
+- Hidden state: h_t = o_t * tanh(C_t)
+
+Gated Recurrent Unit (GRU):
+Simplified version of LSTM with fewer parameters:
+- Update gate: z_t = sigma(W_z * [h_(t-1), x_t])
+- Reset gate: r_t = sigma(W_r * [h_(t-1), x_t])
+- Hidden state: h_t = (1-z_t) * h_(t-1) + z_t * tanh(W * [r_t * h_(t-1), x_t])
+
+Bidirectional RNNs:
+Process sequences in both forward and backward directions, capturing context from both past and future time steps.
+
+Sequence-to-Sequence Models:
+Encoder-decoder architecture for tasks like machine translation:
+1. Encoder: Processes input sequence into a fixed-length context vector
+2. Decoder: Generates output sequence from the context vector
+
+
+Chapter 5: Attention and Transformers
+
+Attention Mechanism:
+Instead of compressing the entire input sequence into a single vector, attention allows the model to focus on relevant parts of the input for each output step.
+
+Score function: e_ij = alignment(s_i, h_j)
+Attention weights: alpha_ij = softmax(e_ij)
+Context vector: c_i = sum(alpha_ij * h_j)
+
+Self-Attention:
+Each position in a sequence attends to all other positions. For each input, three vectors are computed:
+- Query (Q): What am I looking for?
+- Key (K): What do I contain?
+- Value (V): What information do I provide?
+
+Attention(Q, K, V) = softmax(Q * K^T / sqrt(d_k)) * V
+
+Multi-Head Attention:
+Run multiple attention operations in parallel with different learned projections:
+MultiHead(Q, K, V) = Concat(head_1, ..., head_h) * W_O
+Where head_i = Attention(Q * W_Q_i, K * W_K_i, V * W_V_i)
+
+Transformer Architecture:
+The Transformer replaces recurrence with self-attention:
+- Encoder: Stack of layers, each with multi-head self-attention + feed-forward network
+- Decoder: Adds masked self-attention and encoder-decoder attention
+- Positional Encoding: Since no recurrence, position information must be explicitly added
+
+Key Transformer Models:
+- BERT (Bidirectional): Pre-trained with masked language modeling
+- GPT (Generative): Auto-regressive language model
+- T5 (Text-to-Text): Frames all NLP tasks as text generation
+
+
+Chapter 6: Unsupervised and Self-Supervised Learning
+
+Autoencoders:
+Neural networks trained to reconstruct their input:
+- Encoder: Maps input to a lower-dimensional representation (latent space)
+- Decoder: Reconstructs input from the latent representation
+- Loss: Reconstruction error (MSE between input and output)
+
+Variational Autoencoders (VAEs):
+Generate new data by learning a probability distribution in latent space:
+- Encoder outputs mean and variance of a Gaussian distribution
+- Sample from this distribution using reparameterization trick
+- Loss: Reconstruction loss + KL divergence from standard normal
+
+Generative Adversarial Networks (GANs):
+Two networks trained adversarially:
+- Generator: Creates fake data from random noise
+- Discriminator: Distinguishes real from fake data
+- Training: Generator tries to fool discriminator, discriminator tries to catch fakes
+- Min-max game: min_G max_D [E[log(D(x))] + E[log(1 - D(G(z)))]]
+
+Contrastive Learning:
+Self-supervised approach that learns representations by:
+1. Creating positive pairs (augmented views of same image)
+2. Creating negative pairs (views of different images)
+3. Training model to pull positive pairs together and push negative pairs apart
+
+Principal Component Analysis (PCA):
+Linear dimensionality reduction technique:
+1. Center the data (subtract mean)
+2. Compute covariance matrix
+3. Find eigenvectors and eigenvalues
+4. Project data onto top k eigenvectors (principal components)
+PCA finds directions of maximum variance in the data.
+
+t-SNE (t-distributed Stochastic Neighbor Embedding):
+Non-linear dimensionality reduction for visualization:
+1. Compute pairwise similarities in high-dimensional space
+2. Define similar probabilities in low-dimensional space
+3. Minimize KL divergence between the two distributions

@@ -1,0 +1,43 @@
+# ─── Environment ─────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Python ──────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.venv/
+*.whl
+
+# ─── Node ────────────────────────────────────
+node_modules/
+frontend/dist/
+
+# ─── Runtime Data (generated locally) ────────
+backend/data/
+backend/knowledge_base/chroma_db/
+
+# ─── PDFs (too large for git, users add their own) ──
+backend/knowledge_base/books/*.pdf
+
+# ─── Keep TXT knowledge base files (included in repo) ──
+!backend/knowledge_base/books/*.txt
+
+# ─── IDE ─────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.code-workspace
+
+# ─── OS ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Logs ────────────────────────────────────
+*.log
+npm-debug.log*

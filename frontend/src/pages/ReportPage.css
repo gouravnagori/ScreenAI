@@ -1,0 +1,300 @@
+/* ═══════════════════════════════════════════════════════
+   Report Page Styles
+   ═══════════════════════════════════════════════════════ */
+
+.report {
+  padding: var(--space-2xl) 0 var(--space-3xl);
+}
+
+/* ─── Report Header ───────────────────────────────────── */
+.report-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.report-header h1 {
+  margin-bottom: var(--space-sm);
+}
+
+.report-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.report-date {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.recommendation-badge {
+  padding: 12px 24px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  border: 2px solid;
+  white-space: nowrap;
+  animation: scaleIn 0.5s ease;
+}
+
+/* ─── Score Cards ─────────────────────────────────────── */
+.scores-section {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.score-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* ─── Report Sections ─────────────────────────────────── */
+.report-section {
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+}
+
+.report-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+}
+
+.report-summary-text,
+.report-feedback-text {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* ─── Strengths / Weaknesses ──────────────────────────── */
+.sw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.sw-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sw-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.sw-strength {
+  background: rgba(52, 211, 153, 0.05);
+}
+
+.sw-weakness {
+  background: rgba(251, 191, 36, 0.05);
+}
+
+.sw-icon {
+  flex-shrink: 0;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.sw-strength .sw-icon {
+  color: var(--color-success);
+}
+
+.sw-weakness .sw-icon {
+  color: var(--color-warning);
+}
+
+/* ─── Topic Performance ───────────────────────────────── */
+.topic-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.topic-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.topic-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topic-name {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.topic-score {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.topic-bar {
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.topic-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1s ease;
+}
+
+/* ─── Q&A Log ─────────────────────────────────────────── */
+.qa-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.qa-card {
+  padding: var(--space-md) var(--space-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.qa-card:hover {
+  border-color: var(--border-accent);
+}
+
+.qa-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.qa-num {
+  width: 28px;
+  height: 28px;
+  background: var(--accent-glow);
+  color: var(--accent-primary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
+.qa-info {
+  flex: 1;
+}
+
+.qa-question {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.qa-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.qa-toggle {
+  color: var(--text-muted);
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.qa-body {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.qa-answer,
+.qa-feedback {
+  margin-bottom: var(--space-md);
+}
+
+.qa-answer strong,
+.qa-feedback strong {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.qa-answer p,
+.qa-feedback p {
+  font-size: var(--font-size-sm);
+  line-height: 1.7;
+}
+
+.qa-feedback {
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(129, 140, 248, 0.05);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent-primary);
+}
+
+.qa-source {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Skills list in report */
+.report-section .skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .report-header {
+    flex-direction: column;
+  }
+
+  .scores-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sw-grid {
+    grid-template-columns: 1fr;
+  }
+}

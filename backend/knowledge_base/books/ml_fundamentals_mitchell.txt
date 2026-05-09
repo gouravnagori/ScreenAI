@@ -1,0 +1,286 @@
+Machine Learning Fundamentals — Based on Tom Mitchell's Machine Learning
+
+Chapter 1: Introduction to Machine Learning
+
+Machine learning is the study of computer algorithms that improve automatically through experience. A computer program is said to learn from experience E with respect to some class of tasks T and performance measure P, if its performance at tasks in T, as measured by P, improves with experience E.
+
+For example, a checkers-playing program might improve its performance at the task of playing checkers (T), as measured by its ability to win games (P), through experience of playing games against itself (E).
+
+Well-Posed Learning Problems:
+A well-defined learning problem requires three things: the class of tasks, the measure of performance, and the source of experience. Key examples include:
+- Learning to recognize spoken words
+- Learning to drive an autonomous vehicle
+- Learning to classify new astronomical structures
+- Learning to play backgammon at an expert level
+
+Types of Learning:
+1. Supervised Learning: The training data includes both the input and the desired output. The learner must find a function that maps inputs to outputs. Examples include classification (discrete outputs) and regression (continuous outputs).
+
+2. Unsupervised Learning: The training data consists of input vectors without corresponding target values. The goal is to discover groups of similar examples (clustering), determine the distribution of data (density estimation), or project high-dimensional data to lower dimensions for visualization.
+
+3. Reinforcement Learning: The learner interacts with an environment through actions and receives rewards or penalties. The goal is to learn a policy that maximizes cumulative reward over time.
+
+4. Semi-supervised Learning: Combines a small amount of labeled data with a large amount of unlabeled data during training. This is especially useful when labeling data is expensive or time-consuming.
+
+Designing a Learning System:
+To design a machine learning system, several key choices must be made:
+- Choosing the training experience (direct vs. indirect feedback)
+- Choosing the target function to learn
+- Choosing a representation for the target function
+- Choosing an algorithm for learning the target function
+
+
+Chapter 2: Concept Learning and the General-to-Specific Ordering
+
+Concept learning is the task of inferring a boolean-valued function from training examples. It can be viewed as the task of searching through a predefined space of potential hypotheses for one that best fits the training examples.
+
+The hypothesis space is the set of all possible hypotheses that the learner may consider. A concept is a boolean-valued function over a set of instances, identifying a subset of instances as positive examples.
+
+General-to-Specific Ordering of Hypotheses:
+Given two hypotheses h1 and h2, h1 is more general than h2 if and only if every instance that satisfies h2 also satisfies h1. This ordering provides a useful structure for organizing the search through the hypothesis space.
+
+Find-S Algorithm:
+1. Initialize h to the most specific hypothesis in the hypothesis space
+2. For each positive training instance x:
+   - For each attribute constraint ai in h:
+     - If the constraint is satisfied by x, do nothing
+     - Else replace ai with the next more general constraint consistent with x
+3. Output hypothesis h
+
+The Find-S algorithm finds the most specific hypothesis consistent with the positive training examples. However, it has limitations: it ignores negative examples and there's no way to determine if the learned concept is unique.
+
+Candidate-Elimination Algorithm:
+This algorithm maintains a set of hypotheses consistent with the training data, represented by the version space. The version space is bounded by:
+- The most general hypotheses (G boundary)
+- The most specific hypotheses (S boundary)
+
+The version space converges as more examples are observed, eventually containing only hypotheses consistent with all observed examples.
+
+
+Chapter 3: Decision Tree Learning
+
+Decision tree learning is one of the most widely used methods for inductive inference. It approximates discrete-valued target functions by representing the learned function as a decision tree.
+
+A decision tree classifies instances by sorting them from the root node to some leaf node. Each internal node corresponds to a test on an attribute, each branch corresponds to a possible value, and each leaf node assigns a classification.
+
+ID3 Algorithm:
+ID3 learns decision trees by constructing them top-down, beginning with the question "which attribute should be tested at the root?" To answer this question, each attribute is evaluated using a statistical test to determine how well it alone classifies the training examples. The best attribute is selected and used as the test at the root node.
+
+Information Gain:
+Information gain measures how well a given attribute separates the training examples according to their target classification. It is the expected reduction in entropy caused by partitioning the examples according to this attribute.
+
+Entropy H(S) = -sum(p_i * log2(p_i)) for each class i
+
+Information Gain(S, A) = H(S) - sum(|Sv|/|S| * H(Sv)) for each value v of attribute A
+
+Where:
+- S is the collection of examples
+- A is the attribute being tested
+- Sv is the subset of S for which attribute A has value v
+
+Overfitting in Decision Trees:
+A hypothesis overfits the training data if there exists an alternative hypothesis that has greater error on the training data but lower error on the full distribution of instances. Approaches to avoid overfitting include:
+- Pre-pruning: Stop growing the tree before it perfectly classifies training data
+- Post-pruning: Allow the tree to overfit and then prune it
+- Reduced error pruning: Remove nodes that improve validation set accuracy
+- Rule post-pruning: Convert tree to rules, prune individual rules
+
+
+Chapter 4: Artificial Neural Networks
+
+Artificial neural networks (ANNs) provide a general, practical method for learning real-valued, discrete-valued, and vector-valued functions from examples. Neural network learning is robust to errors in the training data and has been successfully applied to problems such as speech recognition, image recognition, and robot control.
+
+Perceptrons:
+A perceptron is a simple type of neural network that can learn linearly separable functions. It takes a vector of real-valued inputs, calculates a weighted sum, and outputs 1 if the result exceeds a threshold, -1 otherwise.
+
+o(x1, ..., xn) = sign(w0 + w1*x1 + ... + wn*xn)
+
+Perceptron Learning Rule:
+wi = wi + delta_wi
+delta_wi = eta * (t - o) * xi
+
+Where eta is the learning rate, t is the target output, and o is the perceptron output.
+
+The perceptron convergence theorem states that the perceptron learning rule will converge to a correct weight vector for any linearly separable dataset.
+
+Multilayer Networks and Backpropagation:
+When target functions are not linearly separable, multilayer networks with hidden layers are needed. The backpropagation algorithm is used to train these networks.
+
+Backpropagation Algorithm:
+1. Forward pass: Propagate input through the network to compute output
+2. Compute error at output layer: delta_k = o_k * (1 - o_k) * (t_k - o_k)
+3. Compute error at hidden layers: delta_h = o_h * (1 - o_h) * sum(w_kh * delta_k)
+4. Update weights: w_ji = w_ji + eta * delta_j * x_ji
+5. Repeat until convergence
+
+Gradient Descent:
+Backpropagation implements gradient descent in weight space. It minimizes the sum of squared errors over all training examples:
+
+E(w) = 0.5 * sum((t_k - o_k)^2) for each output unit k and training example
+
+The gradient descent rule adjusts weights in the direction of steepest descent:
+delta_w = -eta * gradient(E)
+
+Stochastic vs. Batch Gradient Descent:
+- Batch: Compute gradient over all training examples, then update weights
+- Stochastic (online): Update weights after each training example
+- Stochastic gradient descent can avoid local minima and is often faster
+
+
+Chapter 5: Evaluating Hypotheses
+
+Evaluating the accuracy of learned hypotheses is fundamental to machine learning. Several key questions arise: How reliably can we estimate the accuracy of a hypothesis? How should we compare hypotheses?
+
+Estimating Hypothesis Accuracy:
+- Sample error: The fraction of examples misclassified on the sample
+- True error: The probability of misclassifying a randomly drawn instance
+
+Confidence Intervals:
+For a hypothesis with sample error error_S on n examples, the approximate 95% confidence interval for the true error is:
+
+error_S +/- 1.96 * sqrt(error_S * (1 - error_S) / n)
+
+Cross-Validation:
+k-fold cross-validation divides the data into k equal-sized partitions. For each partition, a model is trained on the remaining k-1 partitions and tested on the held-out partition. The overall accuracy is the average of all k runs.
+
+- Leave-one-out cross-validation: k equals the number of examples
+- Stratified cross-validation: Each fold has roughly the same class distribution
+- 10-fold cross-validation is most commonly used
+
+Bias-Variance Decomposition:
+The expected error of a learning algorithm can be decomposed into three components:
+
+Expected Error = Bias^2 + Variance + Irreducible Noise
+
+- Bias: Error from the model's simplifying assumptions (underfitting)
+- Variance: Error from sensitivity to fluctuations in training data (overfitting)
+- Noise: Irreducible error inherent in the problem
+
+High bias models are too simple (underfitting), while high variance models are too complex (overfitting). The goal is to find the right balance.
+
+
+Chapter 6: Bayesian Learning
+
+Bayesian learning methods provide a principled approach to calculating the probability of each hypothesis and making predictions. They offer a framework for understanding many learning algorithms.
+
+Bayes Theorem:
+P(h|D) = P(D|h) * P(h) / P(D)
+
+Where:
+- P(h) is the prior probability of hypothesis h
+- P(D|h) is the likelihood of data D given h
+- P(h|D) is the posterior probability of h given D
+- P(D) is the probability of data D
+
+Maximum A Posteriori (MAP) Hypothesis:
+h_MAP = argmax_h P(h|D) = argmax_h P(D|h) * P(h)
+
+Maximum Likelihood (ML) Hypothesis:
+When all hypotheses are equally likely a priori:
+h_ML = argmax_h P(D|h)
+
+Naive Bayes Classifier:
+The Naive Bayes classifier assumes all features are conditionally independent given the class label:
+
+v_NB = argmax_vj P(vj) * product(P(ai|vj)) for each attribute ai
+
+Despite the strong independence assumption, Naive Bayes works surprisingly well in many practical applications including text classification, spam filtering, and medical diagnosis.
+
+Bayesian Belief Networks:
+When the conditional independence assumption doesn't hold, Bayesian belief networks provide a more expressive representation. They use directed acyclic graphs to represent conditional independence among variables.
+
+
+Chapter 7: Instance-Based Learning
+
+Instance-based learning algorithms store training examples and generalize from them only when a new instance must be classified.
+
+k-Nearest Neighbors (k-NN):
+The k-NN algorithm classifies a new instance by finding the k nearest training examples and assigning the most common class among them.
+
+Distance Metrics:
+- Euclidean distance: sqrt(sum((a_i - b_i)^2))
+- Manhattan distance: sum(|a_i - b_i|)
+- Minkowski distance: (sum(|a_i - b_i|^p))^(1/p)
+
+Advantages of k-NN:
+- Simple to implement
+- No training phase required
+- Naturally handles multi-class classification
+- Can approximate any function given enough data
+
+Disadvantages of k-NN:
+- Slow prediction time for large datasets
+- Sensitive to irrelevant features
+- Requires appropriate distance metric
+- Memory-intensive (stores all training data)
+
+Locally Weighted Regression:
+Instead of using a fixed function to approximate the target, locally weighted regression fits a local model near the query point. Predictions are based on a weighted combination of nearby training examples, with closer examples receiving higher weights.
+
+
+Chapter 8: Support Vector Machines
+
+Support Vector Machines (SVMs) are powerful supervised learning algorithms for classification and regression. They find the optimal hyperplane that maximizes the margin between classes.
+
+Linear SVMs:
+For linearly separable data, the SVM finds the hyperplane w*x + b = 0 that maximizes the margin 2/||w||. The optimization problem is:
+
+Minimize: 0.5 * ||w||^2
+Subject to: y_i * (w * x_i + b) >= 1 for all i
+
+Support Vectors:
+The training examples closest to the decision boundary are called support vectors. They are the critical elements of the training set — the decision boundary depends only on these points.
+
+Soft Margin SVMs:
+For non-linearly separable data, soft margin SVMs introduce slack variables to allow some misclassification:
+
+Minimize: 0.5 * ||w||^2 + C * sum(xi_i)
+Subject to: y_i * (w * x_i + b) >= 1 - xi_i
+
+The parameter C controls the trade-off between maximizing margin and minimizing classification errors.
+
+Kernel Trick:
+SVMs can learn non-linear decision boundaries by mapping inputs to a higher-dimensional feature space using kernel functions:
+
+- Linear: K(x, z) = x * z
+- Polynomial: K(x, z) = (x * z + 1)^d
+- Radial Basis Function (RBF): K(x, z) = exp(-gamma * ||x - z||^2)
+- Sigmoid: K(x, z) = tanh(alpha * x * z + c)
+
+The kernel trick allows SVMs to operate in high-dimensional spaces without explicitly computing the transformation.
+
+
+Chapter 9: Ensemble Methods
+
+Ensemble methods combine multiple learning algorithms to obtain better predictive performance than any single algorithm alone.
+
+Bagging (Bootstrap Aggregating):
+1. Create multiple bootstrap samples from the training data
+2. Train a model on each bootstrap sample
+3. Combine predictions through voting (classification) or averaging (regression)
+
+Bagging reduces variance and is particularly effective with unstable learners like decision trees.
+
+Boosting:
+Boosting creates a strong classifier from a sequence of weak classifiers. Each subsequent classifier focuses on the examples that previous classifiers got wrong.
+
+AdaBoost Algorithm:
+1. Initialize weights: w_i = 1/N for all training examples
+2. For each weak learner t:
+   a. Train weak learner on weighted examples
+   b. Calculate weighted error: epsilon_t
+   c. Calculate learner weight: alpha_t = 0.5 * ln((1 - epsilon_t) / epsilon_t)
+   d. Update example weights: increase for misclassified, decrease for correct
+3. Final prediction: sign(sum(alpha_t * h_t(x)))
+
+Random Forests:
+Random forests combine bagging with random feature selection:
+1. Create bootstrap samples
+2. For each tree, at each split, randomly select m features (m << total features)
+3. Build each tree without pruning
+4. Combine predictions through majority voting
+
+Random forests are robust, handle high-dimensional data well, and provide feature importance measures.
+
+Gradient Boosting:
+Gradient boosting builds models sequentially, with each new model fitting the residual errors of the previous ensemble. It generalizes boosting to arbitrary differentiable loss functions.

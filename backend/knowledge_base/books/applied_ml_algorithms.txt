@@ -1,0 +1,328 @@
+Applied Machine Learning — Data Science and Practical ML Algorithms
+
+Chapter 1: Data Preprocessing and Feature Engineering
+
+Data preprocessing is the process of transforming raw data into a format suitable for machine learning algorithms. Poor data quality leads to poor model performance — "garbage in, garbage out."
+
+Handling Missing Data:
+1. Deletion: Remove rows or columns with missing values
+   - Listwise deletion: Remove entire row if any value is missing
+   - Best when missing data is small percentage (<5%)
+   
+2. Imputation: Fill in missing values
+   - Mean/Median imputation: Replace with column mean or median
+   - Mode imputation: For categorical variables
+   - KNN imputation: Use K nearest neighbors to estimate missing values
+   - MICE (Multiple Imputation by Chained Equations): Iterative imputation
+
+3. Indicator variables: Add binary column indicating missingness
+
+Feature Scaling:
+1. Min-Max Normalization: x_scaled = (x - x_min) / (x_max - x_min)
+   - Scales to [0, 1] range
+   - Sensitive to outliers
+
+2. Standardization (Z-score): x_scaled = (x - mean) / std
+   - Centers at 0 with unit variance
+   - Better for algorithms assuming normally distributed data
+
+3. Robust Scaling: x_scaled = (x - median) / IQR
+   - Uses median and interquartile range
+   - Robust to outliers
+
+Feature Encoding:
+1. One-Hot Encoding: Create binary columns for each category
+   - Works well with linear models
+   - Can create very high-dimensional spaces
+
+2. Label Encoding: Assign integer to each category
+   - Preserves ordinal relationships
+   - May introduce false ordering for nominal variables
+
+3. Target Encoding: Replace category with mean of target variable
+   - Captures relationship between feature and target
+   - Risk of overfitting — use with cross-validation
+
+Feature Engineering:
+- Polynomial Features: Create x^2, x^3, x1*x2 interaction terms
+- Log Transformation: For right-skewed distributions
+- Binning: Convert continuous to categorical
+- Time Features: Extract day_of_week, month, hour from timestamps
+- Text Features: TF-IDF, word count, sentiment scores
+
+
+Chapter 2: Model Selection and Evaluation
+
+Train-Test Split:
+Divide data into training set (70-80%) and test set (20-30%).
+Use training set for model fitting, test set for final evaluation only.
+Important: Never use test data for any model selection decisions.
+
+Cross-Validation Strategies:
+1. K-Fold Cross-Validation:
+   - Split data into K folds
+   - Train on K-1 folds, validate on remaining fold
+   - Repeat K times, average scores
+   - Standard choice: K=5 or K=10
+
+2. Stratified K-Fold:
+   - Preserves class distribution in each fold
+   - Critical for imbalanced datasets
+
+3. Time Series Split:
+   - Respects temporal ordering
+   - Training set always precedes validation set
+
+Classification Metrics:
+1. Accuracy = (TP + TN) / (TP + TN + FP + FN)
+   - Misleading for imbalanced classes
+
+2. Precision = TP / (TP + FP)
+   - Of predicted positives, how many are actually positive?
+   - Important when false positives are costly
+
+3. Recall (Sensitivity) = TP / (TP + FN)
+   - Of actual positives, how many were detected?
+   - Important when false negatives are costly
+
+4. F1 Score = 2 * (Precision * Recall) / (Precision + Recall)
+   - Harmonic mean of precision and recall
+   - Good single metric for imbalanced classes
+
+5. ROC-AUC:
+   - ROC Curve: True Positive Rate vs False Positive Rate at different thresholds
+   - AUC: Area Under the ROC Curve (0.5 = random, 1.0 = perfect)
+   - Threshold-independent evaluation
+
+6. Confusion Matrix:
+   - 2x2 matrix showing TP, TN, FP, FN
+   - Visual representation of classification performance
+
+Regression Metrics:
+1. MAE (Mean Absolute Error) = mean(|y - y_hat|)
+2. MSE (Mean Squared Error) = mean((y - y_hat)^2)
+3. RMSE = sqrt(MSE)
+4. R-squared = 1 - (SS_res / SS_tot)
+   - Proportion of variance explained by the model
+   - R^2 of 1 means perfect prediction
+
+Hyperparameter Tuning:
+1. Grid Search: Exhaustive search over specified parameter grid
+2. Random Search: Random sampling from parameter distributions
+   - Often more efficient than grid search
+3. Bayesian Optimization: Uses probabilistic model to select parameters
+4. Halving Grid Search: Progressively eliminates poor candidates
+
+
+Chapter 3: Regression Algorithms
+
+Linear Regression:
+y = w_0 + w_1*x_1 + w_2*x_2 + ... + w_n*x_n + epsilon
+
+Assumptions:
+- Linearity between features and target
+- Independence of errors
+- Homoscedasticity (constant error variance)
+- Normality of errors
+
+Normal Equation: w = (X^T * X)^(-1) * X^T * y
+Computational cost: O(n^3) for matrix inversion
+
+Ridge Regression (L2):
+Minimize: sum((y_i - y_hat_i)^2) + lambda * sum(w_j^2)
+- Shrinks coefficients toward zero
+- Does not set any coefficient exactly to zero
+- Good when many features are correlated
+
+Lasso Regression (L1):
+Minimize: sum((y_i - y_hat_i)^2) + lambda * sum(|w_j|)
+- Can set coefficients exactly to zero (feature selection)
+- Produces sparse models
+- Good when you suspect only a few features are important
+
+Elastic Net:
+Minimize: sum((y_i - y_hat_i)^2) + lambda_1 * sum(|w_j|) + lambda_2 * sum(w_j^2)
+- Combines L1 and L2 regularization
+- Handles correlated features better than Lasso
+
+Polynomial Regression:
+Extends linear regression by adding polynomial features:
+y = w_0 + w_1*x + w_2*x^2 + ... + w_n*x^n
+Still uses linear regression — linear in parameters, not features
+
+
+Chapter 4: Classification Algorithms
+
+Logistic Regression:
+Despite the name, it is a classification algorithm.
+P(y=1|x) = 1 / (1 + exp(-(w*x + b)))
+
+Decision boundary: w*x + b = 0
+Training: Minimize binary cross-entropy loss using gradient descent
+
+Multiclass Extensions:
+- One-vs-Rest (OvR): Train K binary classifiers
+- One-vs-One (OvO): Train K*(K-1)/2 binary classifiers
+- Softmax Regression: Direct multiclass with softmax activation
+
+Decision Trees:
+- CART (Classification and Regression Trees): Uses Gini impurity
+- Gini Impurity: G = 1 - sum(p_i^2) for each class i
+- Entropy: H = -sum(p_i * log2(p_i)) for each class i
+- Information Gain: Parent entropy minus weighted child entropy
+
+Random Forests:
+Ensemble of decision trees with bagging and random feature selection:
+- Each tree trained on bootstrap sample
+- At each split, random subset of features considered
+- Final prediction: majority vote (classification) or average (regression)
+
+Feature Importance in Random Forests:
+- Mean Decrease Impurity: Average reduction in impurity across all trees
+- Permutation Importance: Decrease in score when feature values are shuffled
+
+Gradient Boosting Machines (GBM):
+Sequential ensemble where each tree corrects errors of previous trees:
+1. Fit initial model (usually mean prediction)
+2. Compute residuals (negative gradient of loss)
+3. Fit new tree to residuals
+4. Update model: F_m(x) = F_(m-1)(x) + learning_rate * h_m(x)
+5. Repeat
+
+XGBoost, LightGBM, CatBoost are popular implementations with:
+- Regularization (L1, L2 on leaf weights)
+- Efficient histogram-based splitting
+- Handling of missing values
+- GPU acceleration
+
+
+Chapter 5: Clustering Algorithms
+
+K-Means Clustering:
+1. Initialize K centroids randomly
+2. Assign each point to nearest centroid
+3. Update centroids as mean of assigned points
+4. Repeat until convergence
+
+Choosing K:
+- Elbow Method: Plot inertia vs K, look for "elbow"
+- Silhouette Score: Measures how similar a point is to its own cluster vs others
+- Gap Statistic: Compares inertia to reference distribution
+
+Limitations of K-Means:
+- Assumes spherical, equally-sized clusters
+- Sensitive to initialization (use K-Means++ for better initialization)
+- Sensitive to outliers
+- Must specify K in advance
+
+Hierarchical Clustering:
+Agglomerative (bottom-up):
+1. Start with each point as its own cluster
+2. Merge two closest clusters
+3. Repeat until desired number of clusters
+
+Linkage Methods:
+- Single: Distance between closest points
+- Complete: Distance between farthest points
+- Average: Average distance between all pairs
+- Ward: Minimizes total within-cluster variance
+
+DBSCAN (Density-Based):
+- Does not require specifying number of clusters
+- Can find arbitrarily shaped clusters
+- Identifies outliers as noise points
+- Parameters: epsilon (neighborhood radius), min_samples
+
+Gaussian Mixture Models (GMM):
+- Probabilistic clustering using mixture of Gaussians
+- Each cluster modeled as Gaussian distribution
+- Fitted using Expectation-Maximization (EM) algorithm
+- Provides soft assignments (probability of belonging to each cluster)
+
+
+Chapter 6: Dimensionality Reduction
+
+The Curse of Dimensionality:
+As the number of features increases:
+- Data becomes sparse
+- Distances between points become similar
+- Models require exponentially more data
+- Computational cost increases dramatically
+
+Feature Selection Methods:
+1. Filter Methods: Statistical tests (chi-squared, ANOVA, correlation)
+2. Wrapper Methods: Recursive Feature Elimination (RFE)
+3. Embedded Methods: L1 regularization, tree-based importance
+
+Principal Component Analysis (PCA):
+1. Standardize the data
+2. Compute covariance matrix
+3. Eigenvalue decomposition
+4. Select top k eigenvectors
+5. Project data onto new subspace
+
+Choosing number of components:
+- Explained variance ratio: Select k components that explain 95% of variance
+- Scree plot: Plot eigenvalues, look for elbow
+
+Linear Discriminant Analysis (LDA):
+- Supervised dimensionality reduction
+- Maximizes separation between classes
+- Minimizes variance within classes
+- Maximum of (C-1) components, where C = number of classes
+
+t-SNE and UMAP:
+Non-linear methods for visualization:
+- t-SNE: Preserves local structure, good for visualization in 2D/3D
+- UMAP: Faster, preserves more global structure than t-SNE
+- Neither preserves absolute distances — only relative neighborhoods
+
+
+Chapter 7: Natural Language Processing (NLP)
+
+Text Preprocessing:
+1. Tokenization: Split text into words or subwords
+2. Lowercasing: Convert to lowercase
+3. Stop word removal: Remove common words (the, is, at)
+4. Stemming: Reduce words to root form (running -> run)
+5. Lemmatization: Reduce to dictionary form (better -> good)
+
+Text Representation:
+1. Bag of Words (BoW): Count word occurrences
+2. TF-IDF: Term Frequency-Inverse Document Frequency
+   TF-IDF(t,d) = TF(t,d) * log(N / DF(t))
+   Weights terms by their importance across documents
+
+3. Word Embeddings: Dense vector representations
+   - Word2Vec: Skip-gram and CBOW architectures
+   - GloVe: Global Vectors from co-occurrence matrix
+   - FastText: Handles out-of-vocabulary words with subword embeddings
+
+4. Contextual Embeddings: Different vectors for same word based on context
+   - ELMo, BERT, GPT produce context-dependent representations
+
+NLP Tasks:
+- Text Classification: Sentiment analysis, spam detection, topic classification
+- Named Entity Recognition (NER): Identifying entities (person, location, organization)
+- Machine Translation: Converting text between languages
+- Question Answering: Extracting answers from context
+- Text Summarization: Condensing long documents
+- Text Generation: Creating coherent text
+
+
+Chapter 8: Recommender Systems
+
+Content-Based Filtering:
+- Recommend items similar to what user has liked before
+- Build user profile from features of liked items
+- Use similarity metrics to find similar items
+
+Collaborative Filtering:
+- User-based: Find similar users, recommend what they liked
+- Item-based: Find similar items based on user interactions
+- Matrix Factorization: Decompose user-item matrix into latent factors
+
+Hybrid Systems:
+- Combine content-based and collaborative filtering
+- Address cold start problem (new users/items)
+- Netflix Prize: Famous competition that advanced the field

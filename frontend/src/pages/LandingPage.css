@@ -1,0 +1,375 @@
+/* ═══════════════════════════════════════════════════════
+   Landing Page Styles
+   ═══════════════════════════════════════════════════════ */
+
+.landing {
+  position: relative;
+  padding: var(--space-2xl) 0 var(--space-3xl);
+  overflow: hidden;
+}
+
+/* ─── Animated Background Orbs ────────────────────────── */
+.landing-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.landing-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  animation: float 12s ease-in-out infinite;
+}
+
+.landing-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: #818cf8;
+  top: -10%;
+  right: -5%;
+  animation-delay: 0s;
+}
+
+.landing-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: #6366f1;
+  bottom: 10%;
+  left: -10%;
+  animation-delay: -4s;
+}
+
+.landing-orb-3 {
+  width: 300px;
+  height: 300px;
+  background: #f093fb;
+  top: 40%;
+  right: 20%;
+  animation-delay: -8s;
+}
+
+.landing > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Hero ────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(129, 140, 248, 0.15);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-lg);
+}
+
+.hero-badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-success);
+  border-radius: 50%;
+  animation: pulse 2s ease infinite;
+}
+
+.hero-title {
+  font-size: var(--font-size-hero);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--space-lg);
+  letter-spacing: -0.03em;
+}
+
+.hero-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ─── Section Titles ──────────────────────────────────── */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-lg);
+}
+
+.section-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--gradient-brand);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+/* ─── Upload Zone ─────────────────────────────────────── */
+.upload-section {
+  max-width: 640px;
+  margin: 0 auto var(--space-3xl);
+}
+
+.upload-zone {
+  border: 2px dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: var(--bg-glass);
+}
+
+.upload-zone:hover,
+.upload-zone.drag-active {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+  box-shadow: var(--shadow-glow);
+}
+
+.upload-zone.has-file {
+  border-color: var(--color-success);
+  border-style: solid;
+  background: rgba(52, 211, 153, 0.05);
+}
+
+.upload-icon {
+  color: var(--text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.upload-text {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.upload-text strong {
+  color: var(--accent-primary);
+}
+
+.upload-hint {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.upload-success {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.upload-file-icon {
+  font-size: 2rem;
+}
+
+.upload-file-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.upload-file-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.upload-file-size {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.upload-remove {
+  margin-left: auto;
+  background: rgba(251, 113, 133, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(251, 113, 133, 0.2);
+  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.upload-remove:hover {
+  background: rgba(251, 113, 133, 0.2);
+}
+
+/* ─── Role Selection ──────────────────────────────────── */
+.role-section {
+  max-width: 800px;
+  margin: 0 auto var(--space-2xl);
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+}
+
+.role-card {
+  position: relative;
+  padding: var(--space-lg);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-base);
+}
+
+.role-card:hover {
+  transform: translateY(-3px);
+}
+
+.role-card.selected {
+  border-color: var(--role-color);
+  background: rgba(var(--role-color), 0.05);
+  box-shadow: 0 0 24px rgba(129, 140, 248, 0.15), inset 0 0 0 1px var(--role-color);
+}
+
+.role-icon {
+  font-size: 2rem;
+  margin-bottom: var(--space-sm);
+}
+
+.role-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.role-desc {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.role-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background: var(--gradient-brand);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  animation: scaleIn 0.3s ease;
+}
+
+/* ─── Error Banner ────────────────────────────────────── */
+.error-banner {
+  max-width: 640px;
+  margin: 0 auto var(--space-lg);
+  padding: 12px 16px;
+  background: rgba(251, 113, 133, 0.08);
+  border: 1px solid rgba(251, 113, 133, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Start Button ────────────────────────────────────── */
+.start-section {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.start-btn {
+  min-width: 300px;
+  padding: 18px 40px;
+  font-size: var(--font-size-lg);
+  border-radius: var(--radius-xl);
+}
+
+.start-hint {
+  margin-top: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* ─── Features ────────────────────────────────────────── */
+.features {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.feature {
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: var(--space-sm);
+}
+
+.feature h4 {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.feature p {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .start-btn {
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
