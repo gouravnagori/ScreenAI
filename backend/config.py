@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     ENABLE_ADAPTIVE_QUESTIONS: bool = True
 
     # ─── Server ──────────────────────────────────────────
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: list[str] = ["*"]  # Allow Vercel frontend to connect
 
     class Config:
         env_file = str(BASE_DIR.parent / ".env")
