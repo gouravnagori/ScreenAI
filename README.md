@@ -30,15 +30,20 @@ An intelligent, role-based candidate screening system that conducts structured t
 - **Resume Upload & Parsing** — PDF/text resume upload with automatic skill extraction, experience detection, and domain identification
 - **Role-Based Screening** — Support for 4 roles: AI/ML Engineer, Data Scientist, Backend Engineer, Full-Stack Developer
 - **RAG-Powered Questions** — Questions grounded in ML textbook knowledge bases, not generic templates
-- **Adaptive Follow-ups** — System generates follow-up questions based on answer quality
-- **Comprehensive Evaluation** — Per-question scoring, topic-wise performance, and hiring recommendation
-- **Session Persistence** — All data stored in SQLite with full traceability
+- **Voice-Enabled Interviewing** — Web Speech API integration for candidiate voice input and AI question playback
+- **Anti-Cheat Proctoring** — Real-time tab-switch tracking with automated recruiter alerts
+- **Visual Analytics Dashboard** — Recharts-powered Radar Charts for deep technical score visualization
+- **HR Operations Dashboard** — Secure, password-protected portal (`/hr`) for recruiters to view all candidate sessions
+- **PDF Report Generation** — One-click professional PDF downloads of candidate evaluations
+- **Time Analytics** — Per-question and overall session time tracking
 
 ### Technical Highlights
 - **Semantic Chunking** — 500-token chunks with 50-token overlap, preserving paragraph boundaries
 - **Role-Filtered Retrieval** — ChromaDB metadata filtering ensures role-relevant content
 - **Context Traceability** — Every question tracks which knowledge base content informed its generation
 - **Modular Architecture** — Clean separation between API, services, and data layers
+- **Markdown Processing** — Real-time formatting of LLM outputs using `react-markdown`
+- **Native Browser APIs** — Zero-dependency Web Speech and Document Visibility API integration
 
 ---
 
@@ -51,6 +56,10 @@ An intelligent, role-based candidate screening system that conducts structured t
 │  │  Landing  │→ │  Interview   │→ │   Report/Summary   │    │
 │  │  Page     │  │  Page        │  │   Page             │    │
 │  └──────────┘  └──────────────┘  └────────────────────┘    │
+│                                           │                   │
+│                                  ┌────────▼───────────┐    │
+│                                  │   HR Dashboard     │    │
+│                                  └────────────────────┘    │
 └────────────────────────┬────────────────────────────────────┘
                          │ REST API
 ┌────────────────────────┴────────────────────────────────────┐
@@ -262,8 +271,9 @@ npm run dev
 │   │   ├── api/client.js           # Axios API client
 │   │   ├── pages/
 │   │   │   ├── LandingPage.jsx     # Resume upload + role selection
-│   │   │   ├── InterviewPage.jsx   # Q&A interview flow
-│   │   │   └── ReportPage.jsx      # Evaluation report
+│   │   │   ├── InterviewPage.jsx   # Q&A interview flow with voice/proctoring
+│   │   │   ├── ReportPage.jsx      # Evaluation report with PDF download
+│   │   │   └── HRDashboard.jsx     # Secure recruiter dashboard
 │   │   └── components/
 │   │       └── Header.jsx          # Navigation header
 │   ├── index.html
