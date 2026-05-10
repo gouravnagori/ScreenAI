@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getNextQuestion, submitAnswer, completeInterview } from '../api/client'
+import ReactMarkdown from 'react-markdown'
+import { Mic, Square, Volume2, VolumeX, AlertTriangle } from 'lucide-react'
 import './InterviewPage.css'
 
 export default function InterviewPage() {
@@ -19,12 +21,82 @@ export default function InterviewPage() {
   const [answered, setAnswered] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
 
+  // Extension States
+  const [warnings, setWarnings] = useState(0)
+  const [isRecording, setIsRecording] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const recognitionRef = useRef(null)
+
   // Load first question if navigated directly
   useEffect(() => {
     if (!currentQuestion && sessionId) {
       loadNextQuestion()
     }
   }, [sessionId])
+
+  // Anti-Cheat / Proctoring: Track tab switches
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && !isComplete) {
+        setWarnings(w => w + 1)
+        setTimeout(() => alert('⚠️ PROCTORING WARNING: Tab switch detected. This action has been logged.'), 100)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [isComplete])
+
+  // Speech Recognition Setup
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      const recog = new SpeechRecognition()
+      recog.continuous = true
+      recog.interimResults = true
+      
+      recog.onresult = (event) => {
+        let finalTranscript = ''
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript + ' '
+          }
+        }
+        if (finalTranscript) {
+          setAnswerText(prev => (prev + ' ' + finalTranscript).trim())
+        }
+      }
+      recog.onerror = (event) => {
+        console.error('Speech recognition error', event.error)
+        setIsRecording(false)
+      }
+      recog.onend = () => {
+        setIsRecording(false)
+      }
+      recognitionRef.current = recog
+    }
+  }, [])
+
+  const toggleRecording = () => {
+    if (!recognitionRef.current) return alert('Speech recognition not supported in this browser.')
+    if (isRecording) {
+      recognitionRef.current.stop()
+    } else {
+      recognitionRef.current.start()
+      setIsRecording(true)
+    }
+  }
+
+  const toggleSpeech = (text) => {
+    if (isPlaying) {
+      window.speechSynthesis.cancel()
+      setIsPlaying(false)
+      return
+    }
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.onend = () => setIsPlaying(false)
+    setIsPlaying(true)
+    window.speechSynthesis.speak(utterance)
+  }
 
   const loadNextQuestion = async () => {
     try {
@@ -44,6 +116,17 @@ export default function InterviewPage() {
     if (!answerText.trim() || submitting) return
     setSubmitting(true)
     setError('')
+
+    // Stop any playing audio
+    if (isPlaying) {
+      window.speechSynthesis.cancel()
+      setIsPlaying(false)
+    }
+    
+    // Stop recording if active
+    if (isRecording && recognitionRef.current) {
+      recognitionRef.current.stop()
+    }
 
     try {
       const result = await submitAnswer(sessionId, currentQuestion.question_id, answerText.trim())
@@ -75,7 +158,7 @@ export default function InterviewPage() {
     setError('')
     try {
       const summary = await completeInterview(sessionId)
-      navigate(`/report/${sessionId}`, { state: summary })
+      navigate(`/report/${sessionId}`, { state: { ...summary, warnings } })
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to generate evaluation')
       setCompleting(false)
@@ -112,6 +195,12 @@ export default function InterviewPage() {
                 <span className="info-label">Progress</span>
                 <span className="info-value">{answered}/{totalQuestions}</span>
               </div>
+              {warnings > 0 && (
+                <div className="info-row warning-row" style={{ color: '#fb7185', marginTop: '8px' }}>
+                  <span className="info-label"><AlertTriangle size={14} style={{ marginRight: '4px', verticalAlign: 'text-bottom' }}/> Warnings</span>
+                  <span className="info-value warning-value">{warnings}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -192,7 +281,19 @@ export default function InterviewPage() {
                 </div>
 
                 <div className="question-body">
-                  <p className="question-text">{currentQuestion.question_text}</p>
+                  <div className="question-actions" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                     <button 
+                       className="btn btn-icon" 
+                       onClick={() => toggleSpeech(currentQuestion.question_text)}
+                       title={isPlaying ? "Stop Reading" : "Read Question"}
+                       style={{ padding: '8px', background: 'var(--bg-tertiary)', borderRadius: '8px', border: '1px solid var(--border-color)', color: isPlaying ? 'var(--accent-primary)' : 'inherit', cursor: 'pointer' }}
+                     >
+                       {isPlaying ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                     </button>
+                  </div>
+                  <div className="question-text" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
+                    <ReactMarkdown>{currentQuestion.question_text}</ReactMarkdown>
+                  </div>
                 </div>
               </div>
 
@@ -207,10 +308,31 @@ export default function InterviewPage() {
                   disabled={submitting}
                   rows={6}
                 />
-                <div className="answer-footer">
-                  <span className="char-count">
-                    {answerText.length} / 5000
-                  </span>
+                <div className="answer-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                  <div className="answer-tools" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                    <button 
+                      className="btn btn-icon"
+                      onClick={toggleRecording}
+                      title={isRecording ? "Stop Recording" : "Start Recording"}
+                      style={{ 
+                        padding: '8px 12px', 
+                        background: isRecording ? 'rgba(251, 113, 133, 0.1)' : 'var(--bg-tertiary)', 
+                        borderRadius: '8px', 
+                        border: `1px solid ${isRecording ? 'rgba(251, 113, 133, 0.3)' : 'var(--border-color)'}`, 
+                        color: isRecording ? '#fb7185' : 'inherit',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      {isRecording ? <Square size={16} /> : <Mic size={16} />}
+                      {isRecording ? "Stop" : "Speak"}
+                    </button>
+                    <span className="char-count" style={{ opacity: 0.6, fontSize: '0.9rem' }}>
+                      {answerText.length} / 5000
+                    </span>
+                  </div>
                   <button
                     className="btn btn-primary"
                     onClick={handleSubmitAnswer}

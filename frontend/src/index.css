@@ -494,6 +494,40 @@ textarea {
   font-weight: 700;
 }
 
+/* ─── Markdown Styles ─────────────────────────────────── */
+.markdown-content, .markdown-body-override {
+  font-family: var(--font-family);
+  line-height: 1.6;
+}
+.markdown-content p, .markdown-body-override p {
+  margin-bottom: 0.75em;
+}
+.markdown-content code, .markdown-body-override code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
+.markdown-content pre, .markdown-body-override pre {
+  background-color: #0d0d14;
+  padding: 1em;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+}
+.markdown-content pre code, .markdown-body-override pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #e2e8f0;
+}
+.markdown-content strong, .markdown-body-override strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 /* ─── Responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {
   :root {

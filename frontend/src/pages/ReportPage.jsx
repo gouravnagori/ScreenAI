@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
 import { getInterviewSummary } from '../api/client'
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
+import ReactMarkdown from 'react-markdown'
+import { AlertTriangle } from 'lucide-react'
 import './ReportPage.css'
 
 function ScoreRing({ score, label, color }) {
@@ -95,6 +98,23 @@ export default function ReportPage() {
   if (!report) return null
 
   const recStyle = getRecommendationStyle(report.recommendation)
+  const warnings = report.warnings || 0
+
+  // Prepare data for Radar Chart
+  const radarData = [
+    { subject: 'Overall', A: report.overall_score || 0, fullMark: 10 },
+    { subject: 'Technical', A: report.technical_depth_score || 0, fullMark: 10 },
+    { subject: 'Communication', A: report.communication_score || 0, fullMark: 10 },
+    { subject: 'Relevance', A: report.relevance_score || 0, fullMark: 10 },
+  ]
+  
+  if (report.topic_performance) {
+    Object.entries(report.topic_performance).forEach(([topic, score]) => {
+      // Shorten long topic names for the chart
+      const shortTopic = topic.length > 15 ? topic.substring(0, 15) + '...' : topic
+      radarData.push({ subject: shortTopic, A: score, fullMark: 10 })
+    })
+  }
 
   return (
     <div className="report page">
@@ -122,12 +142,38 @@ export default function ReportPage() {
           </div>
         </section>
 
-        {/* Score Cards */}
-        <section className="scores-section animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          <ScoreRing score={report.overall_score} label="Overall" color={getScoreColor(report.overall_score)} />
-          <ScoreRing score={report.technical_depth_score} label="Technical Depth" color={getScoreColor(report.technical_depth_score)} />
-          <ScoreRing score={report.communication_score} label="Communication" color={getScoreColor(report.communication_score)} />
-          <ScoreRing score={report.relevance_score} label="Relevance" color={getScoreColor(report.relevance_score)} />
+        {warnings > 0 && (
+          <div className="report-section glass-card animate-fade-in-up" style={{ borderColor: 'rgba(251, 113, 133, 0.3)', background: 'rgba(251, 113, 133, 0.05)', animationDelay: '0.05s' }}>
+            <h3 className="report-section-title" style={{ color: '#fb7185', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={20} /> Proctoring Flags Detected
+            </h3>
+            <p style={{ margin: 0, opacity: 0.9 }}>We detected <strong>{warnings}</strong> tab switches or window exits during the assessment. This has been logged for the recruiter's review.</p>
+          </div>
+        )}
+
+        {/* Analytics Dashboard (Radar Chart + Scores) */}
+        <section className="analytics-section animate-fade-in-up" style={{ animationDelay: '0.1s', display: 'flex', gap: '24px', flexWrap: 'wrap', marginBottom: 'var(--space-xl)' }}>
+          <div className="radar-chart-container glass-card" style={{ flex: '1 1 400px', height: '380px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+            <h3 className="report-section-title" style={{ marginBottom: '10px' }}>📊 Visual Analytics</h3>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                  <PolarGrid stroke="rgba(255,255,255,0.15)" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: 500 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 10]} tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} />
+                  <Radar name="Score" dataKey="A" stroke="#818cf8" fill="#818cf8" fillOpacity={0.5} strokeWidth={2} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: '#1e1e2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          
+          <div className="scores-grid" style={{ flex: '1 1 300px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignContent: 'start' }}>
+            <ScoreRing score={report.overall_score} label="Overall" color={getScoreColor(report.overall_score)} />
+            <ScoreRing score={report.technical_depth_score} label="Technical Depth" color={getScoreColor(report.technical_depth_score)} />
+            <ScoreRing score={report.communication_score} label="Communication" color={getScoreColor(report.communication_score)} />
+            <ScoreRing score={report.relevance_score} label="Relevance" color={getScoreColor(report.relevance_score)} />
+          </div>
         </section>
 
         {/* Summary */}
@@ -235,12 +281,16 @@ export default function ReportPage() {
                     <div className="qa-body animate-fade-in">
                       <div className="qa-answer">
                         <strong>Answer:</strong>
-                        <p>{qa.answer}</p>
+                        <div className="markdown-body-override" style={{ marginTop: '8px' }}>
+                          <ReactMarkdown>{qa.answer}</ReactMarkdown>
+                        </div>
                       </div>
                       {qa.feedback && (
-                        <div className="qa-feedback">
+                        <div className="qa-feedback" style={{ marginTop: '16px' }}>
                           <strong>Feedback:</strong>
-                          <p>{qa.feedback}</p>
+                          <div className="markdown-body-override" style={{ marginTop: '8px' }}>
+                            <ReactMarkdown>{qa.feedback}</ReactMarkdown>
+                          </div>
                         </div>
                       )}
                       {qa.context_source && (
