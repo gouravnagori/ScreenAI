@@ -1,15 +1,24 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllSessions } from '../api/client'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Lock, LogOut } from 'lucide-react'
 
 export default function HRDashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    sessionStorage.getItem('hr_auth') === 'true'
+  )
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loginError, setLoginError] = useState('')
+
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadSessions()
-  }, [])
+    if (isAuthenticated) {
+      loadSessions()
+    }
+  }, [isAuthenticated])
 
   const loadSessions = async () => {
     try {
@@ -22,6 +31,23 @@ export default function HRDashboard() {
     }
   }
 
+  const handleLogin = (e) => {
+    e.preventDefault()
+    if (username === 'hris3463' && password === '#7897hrnu') {
+      setIsAuthenticated(true)
+      sessionStorage.setItem('hr_auth', 'true')
+      setLoginError('')
+    } else {
+      setLoginError('Invalid ID or Password')
+    }
+  }
+
+  const handleLogout = () => {
+    setIsAuthenticated(false)
+    sessionStorage.removeItem('hr_auth')
+    setSessions([])
+  }
+
   const getRecommendationStyle = (rec) => {
     if (!rec) return { color: '#a0a3b5', text: 'Incomplete' }
     const lower = rec.toLowerCase()
@@ -32,14 +58,54 @@ export default function HRDashboard() {
     return { color: '#818cf8', text: rec }
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="hr-dashboard page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+        <div className="glass-card" style={{ padding: '40px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+          <div style={{ background: 'rgba(99, 102, 241, 0.1)', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <Lock size={32} color="#818cf8" />
+          </div>
+          <h2 style={{ marginBottom: '8px' }}>HR Access Restricted</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>Please login to view candidate evaluations.</p>
+          
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <input 
+              type="text" 
+              placeholder="HR ID" 
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              required
+              style={{ padding: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', color: 'white', borderRadius: '8px', fontSize: '15px' }}
+            />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              style={{ padding: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-subtle)', color: 'white', borderRadius: '8px', fontSize: '15px' }}
+            />
+            {loginError && <div style={{ color: '#fb7185', fontSize: '14px', textAlign: 'left', marginTop: '-8px' }}>{loginError}</div>}
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '8px', width: '100%' }}>
+              Secure Login
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="hr-dashboard page">
       <div className="container">
-        <div className="report-header animate-fade-in-up">
+        <div className="report-header animate-fade-in-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
            <div className="report-header-info">
              <h1>HR Dashboard</h1>
              <p style={{ color: 'var(--text-secondary)' }}>Overview of all candidate interview sessions.</p>
            </div>
+           <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+             <LogOut size={16} /> Logout
+           </button>
         </div>
 
         <div className="glass-card animate-fade-in-up" style={{ animationDelay: '0.1s', marginTop: '32px', overflowX: 'auto' }}>
