@@ -30,6 +30,11 @@ export async function getSessionStatus(sessionId) {
   return response.data;
 }
 
+export async function getAllSessions() {
+  const response = await client.get('/session/');
+  return response.data;
+}
+
 // ─── Interview API ──────────────────────────────────────
 
 export async function getNextQuestion(sessionId) {
@@ -37,10 +42,11 @@ export async function getNextQuestion(sessionId) {
   return response.data;
 }
 
-export async function submitAnswer(sessionId, questionId, answerText) {
+export async function submitAnswer(sessionId, questionId, answerText, timeTakenSeconds = 0) {
   const response = await client.post(`/interview/${sessionId}/answer`, {
     question_id: questionId,
     answer_text: answerText,
+    time_taken_seconds: timeTakenSeconds,
   });
   return response.data;
 }

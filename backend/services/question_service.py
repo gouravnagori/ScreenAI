@@ -103,6 +103,7 @@ def submit_answer(
     session_id: str,
     question_id: str,
     answer_text: str,
+    time_taken_seconds: int = 0,
 ) -> dict:
     """
     Submit an answer and optionally generate an adaptive follow-up.
@@ -111,7 +112,7 @@ def submit_answer(
         Dict with answer status and optional follow-up question.
     """
     answer_id = str(uuid.uuid4())
-    database.save_answer(answer_id, question_id, session_id, answer_text)
+    database.save_answer(answer_id, question_id, session_id, answer_text, time_taken_seconds)
 
     # Check for adaptive follow-up if enabled
     follow_up = None

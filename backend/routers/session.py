@@ -9,7 +9,11 @@ from models.schemas import SessionStartResponse, SessionStatusResponse, Question
 from services import resume_parser, question_service
 
 router = APIRouter(prefix="/api/session", tags=["Session"])
-
+    
+@router.get("/", response_model=list[dict])
+async def get_all_sessions():
+    """Get all sessions for HR dashboard."""
+    return database.get_all_sessions_hr()
 
 @router.post("/start", response_model=SessionStartResponse)
 async def start_session(

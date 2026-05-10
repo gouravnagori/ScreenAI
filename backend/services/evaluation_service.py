@@ -70,6 +70,7 @@ def get_session_summary(session_id: str) -> dict:
             "topic": q.get("topic", ""),
             "difficulty": q.get("difficulty", ""),
             "context_source": q.get("context_source", ""),
+            "time_taken_seconds": q.get("time_taken_seconds", 0),
         }
 
         # Add per-question score if available
@@ -83,6 +84,7 @@ def get_session_summary(session_id: str) -> dict:
         qa_pairs.append(pair)
 
     total_answered = sum(1 for q in qa_data if q.get("answer_text"))
+    total_time = sum(q.get("time_taken_seconds", 0) for q in qa_data)
 
     summary = {
         "session_id": session_id,
@@ -90,6 +92,7 @@ def get_session_summary(session_id: str) -> dict:
         "candidate_skills": session.get("extracted_skills", []),
         "total_questions": len(qa_data),
         "total_answered": total_answered,
+        "total_time_taken_seconds": total_time,
         "qa_pairs": qa_pairs,
         "created_at": session.get("created_at", ""),
     }

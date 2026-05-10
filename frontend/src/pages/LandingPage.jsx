@@ -42,6 +42,27 @@ export default function LandingPage() {
   const [dragActive, setDragActive] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [loadingText, setLoadingText] = useState('Analyzing Resume & Generating Questions...')
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingText('Analyzing Resume & Generating Questions...')
+      return
+    }
+    const texts = [
+      'Extracting Skills & Experience...',
+      'Matching to Role Knowledge Base...',
+      'Synthesizing Interview Strategy...',
+      'Calibrating Difficulty...',
+      'Finalizing Question Set...'
+    ]
+    let i = 0
+    const interval = setInterval(() => {
+      i = (i + 1) % texts.length
+      setLoadingText(texts[i])
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [loading])
 
   const handleDrag = (e) => {
     e.preventDefault()
@@ -217,7 +238,7 @@ export default function LandingPage() {
             {loading ? (
               <>
                 <div className="spinner" />
-                Analyzing Resume & Generating Questions...
+                <span className="loading-text-cycle">{loadingText}</span>
               </>
             ) : (
               <>

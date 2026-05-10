@@ -61,6 +61,7 @@ async def submit_answer(session_id: str, request: AnswerSubmitRequest):
         session_id=session_id,
         question_id=request.question_id,
         answer_text=request.answer_text,
+        time_taken_seconds=request.time_taken_seconds
     )
 
     # Build next question response

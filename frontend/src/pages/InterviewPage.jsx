@@ -25,6 +25,7 @@ export default function InterviewPage() {
   const [warnings, setWarnings] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [questionStartTime, setQuestionStartTime] = useState(Date.now())
   const recognitionRef = useRef(null)
 
   // Load first question if navigated directly
@@ -103,6 +104,7 @@ export default function InterviewPage() {
       const q = await getNextQuestion(sessionId)
       setCurrentQuestion(q)
       setTotalQuestions(q.total_questions)
+      setQuestionStartTime(Date.now())
     } catch (err) {
       if (err.response?.status === 404) {
         setIsComplete(true)
@@ -129,12 +131,14 @@ export default function InterviewPage() {
     }
 
     try {
-      const result = await submitAnswer(sessionId, currentQuestion.question_id, answerText.trim())
+      const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000)
+      const result = await submitAnswer(sessionId, currentQuestion.question_id, answerText.trim(), timeTaken)
 
       // Add to history
       setHistory(prev => [...prev, {
         question: currentQuestion,
-        answer: answerText.trim()
+        answer: answerText.trim(),
+        time_taken_seconds: timeTaken
       }])
       setAnswered(prev => prev + 1)
       setAnswerText('')
@@ -145,6 +149,7 @@ export default function InterviewPage() {
       } else {
         setCurrentQuestion(result.next_question)
         setTotalQuestions(result.next_question.total_questions)
+        setQuestionStartTime(Date.now())
       }
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to submit answer')

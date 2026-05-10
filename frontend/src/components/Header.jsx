@@ -38,10 +38,19 @@ export default function Header() {
           <span className="header-badge">v1.0</span>
         </Link>
 
-        {!isHome && (
-          <Link to="/" className="btn btn-secondary btn-sm">
-            ← New Session
+        {isHome ? (
+          <Link to="/hr" className="btn btn-secondary btn-sm" style={{ border: 'none', background: 'transparent' }}>
+             HR Dashboard
           </Link>
+        ) : (
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <Link to="/hr" className="btn btn-secondary btn-sm" style={{ border: 'none', background: 'transparent' }}>
+              HR Dashboard
+            </Link>
+            <Link to="/" className="btn btn-secondary btn-sm">
+              ← New Session
+            </Link>
+          </div>
         )}
       </div>
     </header>

@@ -52,6 +52,7 @@ class AnswerSubmitRequest(BaseModel):
     """Request to submit an answer."""
     question_id: str
     answer_text: str = Field(..., min_length=1, max_length=5000)
+    time_taken_seconds: int = 0
 
 
 class AnswerSubmitResponse(BaseModel):
@@ -73,6 +74,7 @@ class QuestionAnswerPair(BaseModel):
     context_source: str = ""
     score: Optional[float] = None
     feedback: Optional[str] = None
+    time_taken_seconds: Optional[int] = 0
 
 
 class SessionSummaryResponse(BaseModel):
@@ -101,6 +103,7 @@ class SessionSummaryResponse(BaseModel):
     # Metadata
     total_questions: int = 0
     total_answered: int = 0
+    total_time_taken_seconds: int = 0
     created_at: str = ""
 
 

@@ -57,6 +57,7 @@ def init_database():
                 question_id TEXT NOT NULL,
                 session_id TEXT NOT NULL,
                 answer_text TEXT NOT NULL,
+                time_taken_seconds INTEGER DEFAULT 0,
                 submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (question_id) REFERENCES questions(id),
                 FOREIGN KEY (session_id) REFERENCES sessions(id)
@@ -80,7 +81,28 @@ def init_database():
                 FOREIGN KEY (session_id) REFERENCES sessions(id)
             );
         """)
+        
+        # Safely add the new column if the table already exists from a previous run
+        try:
+            conn.execute("ALTER TABLE answers ADD COLUMN time_taken_seconds INTEGER DEFAULT 0;")
+        except sqlite3.OperationalError:
+            pass # Column already exists
+            
         conn.commit()
+    finally:
+        conn.close()
+
+def get_all_sessions_hr() -> list[dict]:
+    """Get all sessions for the HR dashboard."""
+    conn = get_connection()
+    try:
+        rows = conn.execute("""
+            SELECT s.id, s.role, s.status, s.created_at, e.overall_score, e.recommendation 
+            FROM sessions s
+            LEFT JOIN evaluations e ON s.id = e.session_id
+            ORDER BY s.created_at DESC
+        """).fetchall()
+        return [dict(row) for row in rows]
     finally:
         conn.close()
 
@@ -205,14 +227,14 @@ def get_next_unanswered_question(session_id: str) -> dict | None:
 # ─── Answer Operations ───────────────────────────────────
 
 def save_answer(answer_id: str, question_id: str, session_id: str,
-                answer_text: str) -> dict:
+                answer_text: str, time_taken_seconds: int = 0) -> dict:
     """Save a candidate's answer."""
     conn = get_connection()
     try:
         conn.execute("""
-            INSERT INTO answers (id, question_id, session_id, answer_text)
-            VALUES (?, ?, ?, ?)
-        """, (answer_id, question_id, session_id, answer_text))
+            INSERT INTO answers (id, question_id, session_id, answer_text, time_taken_seconds)
+            VALUES (?, ?, ?, ?, ?)
+        """, (answer_id, question_id, session_id, answer_text, time_taken_seconds))
         conn.commit()
         row = conn.execute(
             "SELECT * FROM answers WHERE id = ?", (answer_id,)
@@ -228,7 +250,8 @@ def get_session_answers(session_id: str) -> list[dict]:
     try:
         rows = conn.execute("""
             SELECT q.question_text, q.topic, q.difficulty, q.context_source,
-                   q.rag_context, a.answer_text, a.submitted_at
+                   q.rag_context, a.answer_text, a.submitted_at, a.time_taken_seconds,
+                   q.question_order
             FROM answers a
             JOIN questions q ON a.question_id = q.id
             WHERE a.session_id = ?

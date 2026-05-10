@@ -3,7 +3,8 @@ import { useParams, useLocation } from 'react-router-dom'
 import { getInterviewSummary } from '../api/client'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
 import ReactMarkdown from 'react-markdown'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Download, Clock } from 'lucide-react'
+import html2pdf from 'html2pdf.js'
 import './ReportPage.css'
 
 function ScoreRing({ score, label, color }) {
@@ -116,10 +117,36 @@ export default function ReportPage() {
     })
   }
 
+  const formatTime = (seconds) => {
+    if (!seconds) return '00:00';
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  const handleDownloadPDF = () => {
+    const element = document.getElementById('pdf-report-content');
+    const opt = {
+      margin:       0.3,
+      filename:     `ScreenAI_Report_${report.role.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#0d0f1a' },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  };
+
   return (
     <div className="report page">
       <div className="container">
-        {/* Report Header */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+          <button className="btn btn-secondary" onClick={handleDownloadPDF} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Download size={18} /> Download PDF
+          </button>
+        </div>
+        
+        <div id="pdf-report-content">
+          {/* Report Header */}
         <section className="report-header animate-fade-in-up">
           <div className="report-header-info">
             <h1>Interview Report</h1>
@@ -127,6 +154,10 @@ export default function ReportPage() {
               <span className="tag">{report.role}</span>
               <span className="report-date">
                 {report.total_answered}/{report.total_questions} questions answered
+              </span>
+              <span className="tag" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}>
+                <Clock size={14} style={{ marginRight: '4px' }} />
+                {formatTime(report.total_time_taken_seconds)}
               </span>
             </div>
           </div>
@@ -273,6 +304,10 @@ export default function ReportPage() {
                             {qa.score}/10
                           </span>
                         )}
+                        <span className="tag" style={{ background: 'transparent', borderColor: 'var(--border-subtle)', color: 'var(--text-muted)' }}>
+                          <Clock size={12} style={{ marginRight: '4px' }} />
+                          {formatTime(qa.time_taken_seconds)}
+                        </span>
                       </div>
                     </div>
                     <span className="qa-toggle">{expandedQA === i ? '▼' : '▶'}</span>
@@ -323,6 +358,7 @@ export default function ReportPage() {
             </div>
           </section>
         )}
+        </div>
       </div>
     </div>
   )
