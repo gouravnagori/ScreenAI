@@ -363,5 +363,41 @@ def _fallback_questions(skills: list[str], role: str, count: int) -> list[dict]:
             "difficulty": "hard",
             "context_source": "Fallback — applied ML",
         },
+        {
+            "question_text": "How do you handle missing values in a dataset? Describe three techniques and explain when you would use each.",
+            "topic": "Data Preprocessing",
+            "difficulty": "easy",
+            "context_source": "Fallback — data wrangling",
+        },
+        {
+            "question_text": "Explain the concept of cross-validation. Why is it important and what are some common techniques?",
+            "topic": "Model Evaluation",
+            "difficulty": "medium",
+            "context_source": "Fallback — ML fundamentals",
+        },
+        {
+            "question_text": "What is the curse of dimensionality? How does it affect machine learning algorithms and how can you mitigate it?",
+            "topic": "Dimensionality Reduction",
+            "difficulty": "medium",
+            "context_source": "Fallback — ML fundamentals",
+        },
+        {
+            "question_text": "Describe the architecture of a Convolutional Neural Network (CNN). What are the key components and their functions?",
+            "topic": "Deep Learning",
+            "difficulty": "hard",
+            "context_source": "Fallback — deep learning",
+        },
+        {
+            "question_text": "Explain how a Recurrent Neural Network (RNN) works. What are the limitations of standard RNNs and how do LSTMs/GRUs address them?",
+            "topic": "Deep Learning",
+            "difficulty": "hard",
+            "context_source": "Fallback — deep learning",
+        },
+        {
+            "question_text": "What is A/B testing? How would you design and analyze an A/B test for a new machine learning feature?",
+            "topic": "Experimentation",
+            "difficulty": "medium",
+            "context_source": "Fallback — applied ML",
+        }
     ]
     return base_questions[:count]

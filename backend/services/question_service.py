@@ -116,10 +116,10 @@ def submit_answer(
 
     # Check for adaptive follow-up if enabled
     follow_up = None
-    if settings.ENABLE_ADAPTIVE_QUESTIONS:
-        questions = database.get_session_questions(session_id)
+    all_questions = database.get_session_questions(session_id)
+    if settings.ENABLE_ADAPTIVE_QUESTIONS and len(all_questions) < 10:
         # Find the current question
-        current_q = next((q for q in questions if q["id"] == question_id), None)
+        current_q = next((q for q in all_questions if q["id"] == question_id), None)
 
         if current_q and current_q.get("rag_context"):
             # Try to generate adaptive follow-up
@@ -140,12 +140,12 @@ def submit_answer(
                     "difficulty": follow_up_data.get("difficulty", "medium"),
                     "context_source": "Adaptive follow-up",
                     "rag_context": current_q.get("rag_context", ""),
-                    "question_order": len(questions) + 1,
+                    "question_order": len(all_questions) + 1,
                 }
                 database.save_questions([follow_up])
+                all_questions.append(follow_up)
 
     # Get remaining questions count
-    all_questions = database.get_session_questions(session_id)
     unanswered = [q for q in all_questions if not q.get("answer_text")]
 
     return {

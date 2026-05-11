@@ -283,3 +283,76 @@
     order: -1;
   }
 }
+
+/* ─── Timer and Loading Animations ────────────────────── */
+.timer-badge {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--color-primary);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cool-loader {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+}
+
+.loader-ring:nth-child(1) {
+  border-top-color: var(--color-primary);
+  animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.loader-ring:nth-child(2) {
+  width: 80%;
+  height: 80%;
+  border-right-color: var(--color-secondary);
+  animation: spin-reverse 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.loader-ring:nth-child(3) {
+  width: 60%;
+  height: 60%;
+  border-bottom-color: var(--accent-primary);
+  animation: spin 2.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.loader-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  animation: pulse-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-primary); opacity: 0.5; }
+  100% { box-shadow: 0 0 15px var(--color-primary), 0 0 30px var(--color-primary); opacity: 1; transform: scale(1.2); }
+}

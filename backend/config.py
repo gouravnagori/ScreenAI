@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     LLM_MAX_TOKENS: int = 4096
 
     # ─── Interview Configuration ─────────────────────────
-    QUESTIONS_PER_SESSION: int = 7
+    QUESTIONS_PER_SESSION: int = 10
     ENABLE_ADAPTIVE_QUESTIONS: bool = True
 
     # ─── Server ──────────────────────────────────────────

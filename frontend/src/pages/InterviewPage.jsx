@@ -20,6 +20,7 @@ export default function InterviewPage() {
   const [totalQuestions, setTotalQuestions] = useState(sessionData.total_questions || 5)
   const [answered, setAnswered] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
+  const [elapsedTime, setElapsedTime] = useState(0)
 
   // Extension States
   const [warnings, setWarnings] = useState(0)
@@ -27,6 +28,18 @@ export default function InterviewPage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [questionStartTime, setQuestionStartTime] = useState(Date.now())
   const recognitionRef = useRef(null)
+
+  // Timer logic
+  useEffect(() => {
+    let interval
+    if (currentQuestion && !isComplete && !submitting) {
+      interval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - questionStartTime) / 1000))
+      }, 1000)
+    }
+    return () => clearInterval(interval)
+  }, [currentQuestion, isComplete, submitting, questionStartTime])
+
 
   // Load first question if navigated directly
   useEffect(() => {
@@ -105,6 +118,7 @@ export default function InterviewPage() {
       setCurrentQuestion(q)
       setTotalQuestions(q.total_questions)
       setQuestionStartTime(Date.now())
+      setElapsedTime(0)
     } catch (err) {
       if (err.response?.status === 404) {
         setIsComplete(true)
@@ -150,6 +164,7 @@ export default function InterviewPage() {
         setCurrentQuestion(result.next_question)
         setTotalQuestions(result.next_question.total_questions)
         setQuestionStartTime(Date.now())
+        setElapsedTime(0)
       }
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to submit answer')
@@ -182,6 +197,12 @@ export default function InterviewPage() {
     easy: 'var(--color-success)',
     medium: 'var(--color-warning)',
     hard: 'var(--color-danger)',
+  }
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
 
   return (
@@ -259,9 +280,14 @@ export default function InterviewPage() {
               <div className="question-card glass-card">
                 <div className="question-header">
                   <div className="question-meta">
-                    <span className="question-number">
-                      Question {currentQuestion.question_number} of {totalQuestions}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                      <span className="question-number">
+                        Question {currentQuestion.question_number} of {totalQuestions}
+                      </span>
+                      <div className="timer-badge">
+                        🕒 {formatTime(elapsedTime)}
+                      </div>
+                    </div>
                     <div className="question-tags">
                       {currentQuestion.topic && (
                         <span className="tag">{currentQuestion.topic}</span>
@@ -379,9 +405,14 @@ export default function InterviewPage() {
               </div>
             </div>
           ) : (
-            <div className="loading-area">
-              <div className="spinner spinner-lg" />
-              <p>Loading question...</p>
+            <div className="loading-area animate-fade-in">
+              <div className="cool-loader">
+                <div className="loader-ring"></div>
+                <div className="loader-ring"></div>
+                <div className="loader-ring"></div>
+                <div className="loader-dot"></div>
+              </div>
+              <p className="loading-text-cycle" style={{ marginTop: '20px', fontWeight: '600' }}>Processing Answer & Loading Next...</p>
             </div>
           )}
 
