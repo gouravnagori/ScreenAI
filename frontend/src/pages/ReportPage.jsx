@@ -42,6 +42,7 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(!location.state)
   const [error, setError] = useState('')
   const [expandedQA, setExpandedQA] = useState(null)
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
 
   useEffect(() => {
     if (!report) {
@@ -125,15 +126,24 @@ export default function ReportPage() {
   };
 
   const handleDownloadPDF = () => {
-    const element = document.getElementById('pdf-report-content');
-    const opt = {
-      margin:       0.3,
-      filename:     `ScreenAI_Report_${report.role.replace(/[^a-z0-9]/gi, '_')}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#0d0f1a' },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
+    setIsGeneratingPdf(true);
+    
+    // Wait for the state to update and expand all QA sections before capturing
+    setTimeout(() => {
+      const element = document.getElementById('pdf-report-content');
+      const opt = {
+        margin:       [0.4, 0.4, 0.4, 0.4],
+        filename:     `ScreenAI_Report_${report.role.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 1.0 },
+        html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#0d0f1a', windowWidth: element.scrollWidth },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'legacy'] }
+      };
+      
+      html2pdf().set(opt).from(element).save().then(() => {
+        setIsGeneratingPdf(false);
+      });
+    }, 500);
   };
 
   return (
@@ -145,7 +155,7 @@ export default function ReportPage() {
           </button>
         </div>
         
-        <div id="pdf-report-content">
+        <div id="pdf-report-content" className={isGeneratingPdf ? 'pdf-export-mode' : ''}>
           {/* Report Header */}
         <section className="report-header animate-fade-in-up">
           <div className="report-header-info">
@@ -285,8 +295,8 @@ export default function ReportPage() {
               {report.qa_pairs.map((qa, i) => (
                 <div
                   key={i}
-                  className={`qa-card glass-card ${expandedQA === i ? 'expanded' : ''}`}
-                  onClick={() => setExpandedQA(expandedQA === i ? null : i)}
+                  className={`qa-card glass-card ${expandedQA === i || isGeneratingPdf ? 'expanded' : ''}`}
+                  onClick={() => !isGeneratingPdf && setExpandedQA(expandedQA === i ? null : i)}
                 >
                   <div className="qa-header">
                     <div className="qa-num">{i + 1}</div>
@@ -310,10 +320,10 @@ export default function ReportPage() {
                         </span>
                       </div>
                     </div>
-                    <span className="qa-toggle">{expandedQA === i ? '▼' : '▶'}</span>
+                    <span className="qa-toggle">{expandedQA === i || isGeneratingPdf ? '▼' : '▶'}</span>
                   </div>
-                  {expandedQA === i && (
-                    <div className="qa-body animate-fade-in">
+                  {(expandedQA === i || isGeneratingPdf) && (
+                    <div className="qa-body animate-fade-in" style={{ display: 'block' }}>
                       <div className="qa-answer">
                         <strong>Answer:</strong>
                         <div className="markdown-body-override" style={{ marginTop: '8px' }}>

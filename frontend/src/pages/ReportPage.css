@@ -296,5 +296,38 @@
 
   .sw-grid {
     grid-template-columns: 1fr;
-  }
+}
+
+/* ─── PDF Export Mode ─────────────────────────────────── */
+.pdf-export-mode {
+  padding: 20px;
+  background-color: #0d0f1a;
+}
+
+.pdf-export-mode .report-section,
+.pdf-export-mode .glass-card,
+.pdf-export-mode .qa-card,
+.pdf-export-mode .score-card {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  margin-bottom: 20px !important;
+}
+
+/* Ensure that text and headers don't break awkwardly */
+.pdf-export-mode h1,
+.pdf-export-mode h2,
+.pdf-export-mode h3,
+.pdf-export-mode p {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Remove hover effects and ensure static layout for print */
+.pdf-export-mode .qa-card {
+  cursor: default;
+  border-color: var(--border-subtle) !important;
+}
+
+.pdf-export-mode .qa-toggle {
+  display: none !important;
 }
