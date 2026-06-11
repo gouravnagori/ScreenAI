@@ -34,7 +34,7 @@ An intelligent, role-based candidate screening system that conducts structured t
 - **Anti-Cheat Proctoring** — Real-time tab-switch tracking with automated recruiter alerts
 - **Visual Analytics Dashboard** — Recharts-powered Radar Charts for deep technical score visualization
 - **HR Operations Dashboard** — Secure, password-protected portal (`/hr`) for recruiters to view all candidate sessions
-- **PDF Report Generation** — One-click professional PDF downloads of candidate evaluations
+- **PDF Report Generation** — One-click professional PDF downloads of candidate evaluations. 
 - **Time Analytics** — Per-question and overall session time tracking
 
 ### Technical Highlights
